@@ -7,10 +7,10 @@ run:
 	uv run python -m src index --max_chunk_size 2000
 
 search:
-	uv run python -m src search --query "FP8_MIN defaults to float8_info.min and FP8_MAX defaults to float8_info.max in the triton_flash_attention module." --k 10
+	uv run python -m src search --query "What is the default value for mlp_bias in ExaoneGatedMLP initialization?" --k 10
 
 answer:
-	uv run python -m src answer --query "What HTTP endpoint is used to dynamically load a LoRA adapter in vLLM?" --k 1
+	uv run python -m src answer --query "What determines whether vLLM's sampler returns Pythonized results or deferred Pythonization arguments?" --k 10
 
 search_dataset:
 	uv run -m src search_dataset \

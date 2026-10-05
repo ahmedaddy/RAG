@@ -28,19 +28,18 @@ class RagPipeline:
         # except Exception as e:
         #     print(f"Error while getting indexing files: {e}")
 
-    # def search(self, question: str, k: int):
-    #     if k <= 0 or len(question.strip()) == 0:
-    #         print("Error: k must be greater than 0 and question must not be empty.")
-    #         return
     def search(self, query: str, k: int = 10):
-        # print("hello")
         if not validate_input(query, k):
             return
-        bm25_docs, chunks_docs = load_index("all")
-        docs_results = search_bm25(bm25_docs, chunks_docs, query, k)
-        # print([isinstance(c, MinimalSource) for c in docs_results])
+        bm25_docs, chunks_docs, bm25_code, chunks_code = load_index()
+        docs_results = search_bm25(bm25_docs, chunks_docs, query, k, True)
+        code_results = search_bm25(bm25_code, chunks_code, query, k, True)
+
+        all_results = (docs_results + code_results)
+        all_results.sort(reverse=True, key=lambda x: x[1])
+        results = (chunk for chunk, s in all_results[:k])
         print(f"\nTop results for: '{query}'\n" + "=" * 40)
-        for i, chunk in enumerate(docs_results):
+        for i, chunk in enumerate(results):
             print(
                 f"{i + 1}. {chunk.file_path}"
                 f" (Chars {chunk.first_character_index}-{chunk.last_character_index})"
@@ -48,12 +47,17 @@ class RagPipeline:
         
     def answer(self, query: str, k: int = 10):
 
-        bm25_docs, chunks_docs = load_index("all")
+        bm25_docs, chunks_docs, bm25_code, chunks_code = load_index()
         generator = RAGGenerator()
         if not validate_input(query, k):
             return False
-        docs_results = search_bm25(bm25_docs, chunks_docs, query, k)
-        answer_text = generator.generate_answer(query, docs_results)
+        docs_results = search_bm25(bm25_docs, chunks_docs, query, k, True)
+        code_results = search_bm25(bm25_code, chunks_code, query, k, True)
+        all_results = (docs_results + code_results)
+        all_results.sort(reverse=True, key=lambda x: x[1])
+        results = [chunk for chunk, s in all_results[:k]]
+        print(results)
+        answer_text = generator.generate_answer(query, results)
         print("Question: ", query)
         print("Answer: ", answer_text)
 
@@ -64,17 +68,23 @@ class RagPipeline:
         if not validate_input("valid", k):
             print("")
             return
-        bm25, chunks = load_index("all")
+        bm25_docs, chunks_docs, bm25_code, chunks_code = load_index()
+
         with open(dataset_path, "r", encoding="utf-8") as f:
             raw_data = json.load(f)
         dataset = RagDataset.model_validate(raw_data)
         search_results = []
         for question in dataset.rag_questions:
-            retreived = search_bm25(bm25, chunks, question.question, k)
+            docs_results = search_bm25(bm25_docs, chunks_docs, question.question, k, True)
+            code_results = search_bm25(bm25_code, chunks_code, question.question, k, True)
+            all_results = (docs_results + code_results)
+            all_results.sort(reverse=True, key=lambda x: x[1])
+            results = [chunk for chunk, s in all_results[:k]]
+
             search_result = MinimalSearchResults(
                 question_id=question.question_id,
                 question=question.question,
-                retrieved_sources=[c for c in retreived]
+                retrieved_sources=[c for c in results]
             )
             search_results.append(search_result)
         student_results = StudentSearchResults(

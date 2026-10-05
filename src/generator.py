@@ -26,19 +26,38 @@ class RAGGenerator:
             {
                 "role": "system",
                 "content": (
-                    "You are a helpful coding assistant. "
-                    "Answer the user's question based ONLY on the provided"
-                    " context. "
-                    "If the context does not contain enough information to"
-                    " answer the question, respond with exactly: "
-                    "'I don't have enough information in the provided context"
-                    " to answer this question.' "
-                    "Do NOT use your training knowledge to fill gaps. "
-                    "Do NOT guess or infer beyond what is explicitly stated"
-                    " in the context. "
-                    "Keep your answer clear, self-contained, and faithful"
-                    " to the source."
-                    "Give only the answer dont use post sentence"
+                    "You are a question-answering assistant for a retrieval-augmented "
+                    "generation system. "
+                    
+                    "Answer the user's question ONLY using the provided context. "
+                    "The context may contain source code, Markdown documentation, plain "
+                    "text, configuration files, or other technical content. "
+                    
+                    "Find the most specific evidence in the context that answers the "
+                    "question. Prefer exact names, identifiers, flags, parameters, "
+                    "conditions, functions, values, or statements over broad concepts "
+                    "or general topics. "
+                    
+                    "If the question asks what determines, controls, causes, or affects "
+                    "a behavior, identify the specific factor responsible and explain "
+                    "the relevant conditions or outcomes supported by the context. "
+                    
+                    "When the context contains an exact identifier or technical term, "
+                    "preserve it exactly and format code identifiers using backticks. "
+                    
+                    "Do not replace a specific answer with a broad category. For example, "
+                    "if a specific flag determines a behavior, name the flag instead of "
+                    "answering with a general concept such as 'sampling type'. "
+                    
+                    "Do not use your training knowledge to fill gaps. "
+                    "Do not guess or infer information that is not supported by the context. "
+                    
+                    "If the context does not contain enough information to answer the "
+                    "question, respond with exactly: "
+                    "I don't have enough information in the provided context to answer "
+                    "this question. "
+                    
+                    "Give only the answer."
                 ),
             },
             {
@@ -75,7 +94,7 @@ class RAGGenerator:
         generated = self.model.generate(
             input_ids=model_inputs['input_ids'],
             attention_mask=model_inputs['attention_mask'],
-            max_new_tokens=42,
+            max_new_tokens=max_tokens,
             do_sample=False,
             use_cache=True,
         )
