@@ -44,9 +44,9 @@ def evaluate_results(student_answer_path, dataset_path, k: int):
             found_count = 0
             overlaps = []
             for s in correct_source:
+                found = False
                 for retreived in top_k_retreived:
                     if (s.file_path == retreived.file_path):
-                        # print(s.file_path)
                         overlap = get_overlap(
                                 s.first_character_index,
                                 s.last_character_index,
@@ -55,8 +55,13 @@ def evaluate_results(student_answer_path, dataset_path, k: int):
                             )
                         overlaps.append(overlap)
                         if overlap >= 0.05:
+                            found = True
                             break
-            found_count += 1
+            if found:
+                found_count += 1
             print("found count: ", found_count)
-            # recall[kval] +=
+            qustion_recall = found_count
+            recall[kval] += qustion_recall
             # print(found_count)
+        recall[kval] /= qustion_count
+    print(recall)
