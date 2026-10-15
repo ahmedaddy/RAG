@@ -1,11 +1,11 @@
 from pathlib import Path
-from rank_bm25 import BM25Okapi
 import string
 import pickle
-
+from rank_bm25 import BM25Okapi
 index_directory = Path("data/processed")
 
-def tokenize(text: str):
+
+def tokenize(text: str) -> list[str]:
     text = text.lower()
     punct = string.punctuation.replace('_', '')
     clean_text = text.translate(str.maketrans(punct, ' ' * len(punct)))
@@ -17,61 +17,61 @@ def tokenize(text: str):
             extended_tokens.extend(t.split('_'))
     return extended_tokens
 
-def indexing_chunks(chunks):
-    print("INDEXER:")
-    print(type(chunks))
-    print(type(chunks[0]))
-    print(chunks[0])
-    
-    print("#" * 40, "\n")
-    print(f"Building index for {len(chunks)} chunks...")
-    print("\n", "#" * 40)
-    index_directory.mkdir(parents=True, exist_ok=True)
 
-    docs_chunks = [
-        c for c in chunks
-        if Path(c.file_path).suffix in {".md", ".txt"}
-    ]
-    code_chunks = [
-        c for c in chunks
-        if Path(c.file_path).suffix in {".py"}
-    ]
-
-    print("docs:", len(docs_chunks))
-    print("code:", len(code_chunks))
-    print("doc type:", type(docs_chunks[0]))
-    print("code type:", type(code_chunks[0]))
-    docs_corpus = [tokenize(c.text) for c in docs_chunks]
-    code_corpus = [tokenize(c.text) for c in code_chunks]
-
-    bm25_docs = BM25Okapi(docs_corpus)
-    bm25_code = BM25Okapi(code_corpus)
-    # print(bm25_docs)
-    with open(index_directory / "bm25_docs.pkl", "wb") as f:
-        pickle.dump(bm25_docs, f)
-    with open(index_directory / "chunks_docs.pkl", "wb") as f:
-        pickle.dump(docs_chunks, f)
-
-    with open(index_directory / "bm25_code.pkl", "wb") as f:
-        pickle.dump(bm25_code, f)
-    with open(index_directory / "chunks_code.pkl", "wb") as f:
-        pickle.dump(code_chunks, f)
-
-def load_index():
+def indexing_chunks(chunks: list) -> None:
     try:
-        with open(index_directory / "bm25_docs.pkl", "rb") as f:
-            bm25_docs = pickle.load(f)
-        with open(index_directory / "chunks_docs.pkl", "rb") as f:
-            chunks_docs = pickle.load(f)
-        with open(index_directory / "bm25_code.pkl", "rb") as f:
-            bm25_code = pickle.load(f)
-        with open(index_directory / "chunks_code.pkl", "rb") as f:
-            chunks_code= pickle.load(f)
-        return bm25_docs, chunks_docs, bm25_code, chunks_code
+        from rank_bm25 import BM25Okapi
+        print("INDEXER:")
+        print(type(chunks))
+        print(type(chunks[0]))
+        print(chunks[0])
+        print("#" * 40, "\n")
+        print(f"Building index for {len(chunks)} chunks...")
+        print("\n", "#" * 40)
+        index_directory.mkdir(parents=True, exist_ok=True)
+
+        docs_chunks = [
+            c for c in chunks
+            if Path(c.file_path).suffix in {".md", ".txt"}
+        ]
+        code_chunks = [
+            c for c in chunks
+            if Path(c.file_path).suffix in {".py"}
+        ]
+
+        print("docs:", len(docs_chunks))
+        print("code:", len(code_chunks))
+        print("doc type:", type(docs_chunks[0]))
+        print("code type:", type(code_chunks[0]))
+        docs_corpus = [tokenize(c.text) for c in docs_chunks]
+        code_corpus = [tokenize(c.text) for c in code_chunks]
+
+        all_chunks = docs_chunks + code_chunks
+        all_corpus = docs_corpus + code_corpus
+        bm25_all = BM25Okapi(all_corpus)
+        with open(index_directory / "bm25_all.pkl", "wb") as f:
+            pickle.dump(bm25_all, f)
+        with open(index_directory / "chunks_all.pkl", "wb") as f:
+            pickle.dump(all_chunks, f)
+    except Exception as e:
+        print(f"Error while indexing chunks: {e}")
+
+
+def load_index() -> tuple:
+    try:
+        with open(index_directory / "bm25_all.pkl", "rb") as f:
+            bm25 = pickle.load(f)
+        with open(index_directory / "chunks_all.pkl", "rb") as f:
+            chunks = pickle.load(f)
+        return bm25, chunks
     except Exception as e:
         print(f"Error loading index: {e}")
+    return None, None
 
-def search_bm25(bm25, chunks, query, k, with_scores=False):
+
+def search_bm25(
+        bm25: BM25Okapi, chunks: list, query: str, k: int, with_scores=False
+        ) -> list:
     query_tokens = tokenize(query)
     scores = bm25.get_scores(query_tokens)
     score_index_pairs = [(scores[i], i) for i in range(len(scores))]
