@@ -3,15 +3,13 @@ import json
 
 
 def get_overlap(start1, end1, start2, end2):
-    overlap_start = max(start1, start2)
-    overlap_end = min(end1, end2)
-    overlap_length = max(0, overlap_end - overlap_start + 1)
-    range1_length = end1 - start1 + 1
-    range2_length = end2 - start2 + 1
-    if range1_length == 0 or range2_length == 0:
-        return 0.0
-    return overlap_length / min(range1_length, range2_length)
-
+    intersection_start = max(start1, start2)
+    intersection_end = min(end1, end2)
+    intersection = max(0, intersection_end - intersection_start)
+    union_area1 = end1 - start1
+    union_area2 = end2 - start2
+    union = union_area1 + union_area2 - intersection
+    return intersection / union
 
 def evaluate_results(student_answer_path, dataset_path, k: int):
     try:
@@ -42,7 +40,6 @@ def evaluate_results(student_answer_path, dataset_path, k: int):
         for kval in k_values:
             top_k_retreived = result.retrieved_sources[:kval]
             found_count = 0
-            overlaps = []
             for s in correct_source:
                 found = False
                 for retreived in top_k_retreived:
@@ -53,15 +50,13 @@ def evaluate_results(student_answer_path, dataset_path, k: int):
                                 retreived.first_character_index,
                                 retreived.last_character_index
                             )
-                        overlaps.append(overlap)
                         if overlap >= 0.05:
                             found = True
                             break
-            if found:
-                found_count += 1
-            print("found count: ", found_count)
-            qustion_recall = found_count
+                if found:
+                    found_count += 1
+            qustion_recall = found_count / len(correct_source)
             recall[kval] += qustion_recall
-            # print(found_count)
-        recall[kval] /= qustion_count
+        for kval in k_values:
+            recall[kval] /= qustion_count
     print(recall)
