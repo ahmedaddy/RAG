@@ -57,6 +57,8 @@ def evaluate_results(student_answer_path, dataset_path, k: int):
                     found_count += 1
             qustion_recall = found_count / len(correct_source)
             recall[kval] += qustion_recall
-        for kval in k_values:
-            recall[kval] /= qustion_count
-    print(recall)
+    for kval in k_values:
+        recall[kval] /= qustion_count
+    print("Evaluation Results:")
+    for kval in k_values:
+        print(f"Recall at {kval}: {recall[kval]:.2f}")

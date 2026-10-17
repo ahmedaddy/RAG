@@ -43,8 +43,8 @@ def indexing_chunks(chunks: list) -> None:
         print("code:", len(code_chunks))
         print("doc type:", type(docs_chunks[0]))
         print("code type:", type(code_chunks[0]))
-        docs_corpus = [tokenize(c.text) for c in docs_chunks]
-        code_corpus = [tokenize(c.text) for c in code_chunks]
+        docs_corpus = [tokenize(f"{c.text}") for c in docs_chunks]
+        code_corpus = [tokenize(f"{c.file_path}\n{c.text}") for c in code_chunks]
 
         all_chunks = docs_chunks + code_chunks
         all_corpus = docs_corpus + code_corpus
