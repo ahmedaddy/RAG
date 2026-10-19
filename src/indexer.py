@@ -1,7 +1,11 @@
-from pathlib import Path
-import string
-import pickle
-from rank_bm25 import BM25Okapi
+try:
+    from pathlib import Path
+    import string
+    import pickle
+    from rank_bm25 import BM25Okapi
+except ImportError:
+    print("Please install the 'rank_bm25' package to use the indexer.")
+
 index_directory = Path("data/processed")
 
 
@@ -43,7 +47,7 @@ def indexing_chunks(chunks: list) -> None:
         print("code:", len(code_chunks))
         print("doc type:", type(docs_chunks[0]))
         print("code type:", type(code_chunks[0]))
-        docs_corpus = [tokenize(f"{c.text}") for c in docs_chunks]
+        docs_corpus = [tokenize(f"{c.file_path}\n{c.text}") for c in docs_chunks]
         code_corpus = [tokenize(f"{c.file_path}\n{c.text}") for c in code_chunks]
 
         all_chunks = docs_chunks + code_chunks
@@ -64,8 +68,12 @@ def load_index() -> tuple:
         with open(index_directory / "chunks_all.pkl", "rb") as f:
             chunks = pickle.load(f)
         return bm25, chunks
+    except FileNotFoundError:
+        raise RuntimeError("Index files not found. Please run the indexing process first.")
+    except PermissionError:
+        raise RuntimeError("Permission denied while accessing index files.")
     except Exception as e:
-        print(f"Error loading index: {e}")
+        raise RuntimeError(f"Error while loading index: {e}")
     return None, None
 
 

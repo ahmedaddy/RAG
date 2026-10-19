@@ -9,6 +9,8 @@ def get_overlap(start1, end1, start2, end2):
     union_area1 = end1 - start1
     union_area2 = end2 - start2
     union = union_area1 + union_area2 - intersection
+    if union == 0:
+        return 0.0
     return intersection / union
 
 def evaluate_results(student_answer_path, dataset_path, k: int):
@@ -55,7 +57,11 @@ def evaluate_results(student_answer_path, dataset_path, k: int):
                             break
                 if found:
                     found_count += 1
-            qustion_recall = found_count / len(correct_source)
+            try:
+                qustion_recall = found_count / len(correct_source)
+            except:
+                raise ZeroDivisionError(f"Error: The correct source \
+list is empty for question_id: {result.question_id}")
             recall[kval] += qustion_recall
     for kval in k_values:
         recall[kval] /= qustion_count

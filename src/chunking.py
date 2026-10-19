@@ -1,7 +1,13 @@
-from pathlib import Path
-from .models import MinimalSource
-import ast
-
+try:
+    from pathlib import Path
+    from .models import MinimalSource
+    import ast
+except ImportError as e:
+    print(f"Error importing modules: {e}")
+    raise
+except Exception as e:
+    print(f"Unexpected error: {e}")
+    raise
 
 def split_point_finder(
         file_path: Path, file_text: str, start: int, max_chunk_size: int

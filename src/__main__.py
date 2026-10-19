@@ -1,14 +1,20 @@
-import fire
-import json
-from pathlib import Path
-from tqdm import tqdm
-from .chunking import get_files
-from .indexer import indexing_chunks, load_index, search_bm25
-from .generator import RAGGenerator
-from .models import RagDataset, StudentSearchResults, \
-    MinimalSearchResults, MinimalAnswer
-from .evaluator import evaluate_results
-
+try:
+    import fire
+    import json
+    from pathlib import Path
+    from tqdm import tqdm
+    from .chunking import get_files
+    from .indexer import indexing_chunks, load_index, search_bm25
+    from .generator import RAGGenerator
+    from .models import RagDataset, StudentSearchResults, \
+        MinimalSearchResults, MinimalAnswer
+    from .evaluator import evaluate_results
+except ImportError as e:
+    print(f"Error importing modules: {e}")
+    raise
+except Exception as e:
+    print(f"Unexpected error: {e}")
+    raise
 
 def validate_input(query: str, k: int):
     if not isinstance(query, str) or \
@@ -50,18 +56,20 @@ class RagPipeline:
             )
 
     def answer(self, query: str, k: int = 10):
-        bm25, chunks = load_index()
-        generator = RAGGenerator()
-        if not validate_input(query, k):
-            return False
-        ranked = search_bm25(bm25, chunks, query, k, True)
-        ranked.sort(reverse=True, key=lambda x: x[1])
-        results = [chunk for chunk, s in ranked[:k]]
-        print(results)
-        answer_text = generator.generate_answer(query, results)
-        print("Question: ", query)
-        print("Answer: ", answer_text)
-
+        try:
+            bm25, chunks = load_index()
+            generator = RAGGenerator()
+            if not validate_input(query, k):
+                return False
+            ranked = search_bm25(bm25, chunks, query, k, True)
+            ranked.sort(reverse=True, key=lambda x: x[1])
+            results = [chunk for chunk, s in ranked[:k]]
+            # print(results)
+            answer_text = generator.generate_answer(query, results)
+            print("Question: ", query)
+            print("Answer: ", answer_text)
+        except Exception as e:
+            print(f"Error while answering: {e}")
     def search_dataset(
             self,
             dataset_path: str,
@@ -69,10 +77,9 @@ class RagPipeline:
             save_directory: str = "data/output/search_results"
             ):
         if not validate_input("valid", k):
-            print("")
+            print("Error: k must be a positive integer.")
             return
         try:
-
             bm25, chunks = load_index()
 
             with open(dataset_path, "r", encoding="utf-8") as f:
