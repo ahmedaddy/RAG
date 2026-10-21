@@ -9,6 +9,7 @@ except Exception as e:
     print(f"Unexpected error: {e}")
     raise
 
+
 def split_point_finder(
         file_path: Path, file_text: str, start: int, max_chunk_size: int
         ) -> int:

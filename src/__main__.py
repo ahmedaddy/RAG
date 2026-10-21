@@ -16,6 +16,7 @@ except Exception as e:
     print(f"Unexpected error: {e}")
     raise
 
+
 def validate_input(query: str, k: int):
     if not isinstance(query, str) or \
             not query.strip() or not isinstance(k, int) or k <= 0:
@@ -70,6 +71,7 @@ class RagPipeline:
             print("Answer: ", answer_text)
         except Exception as e:
             print(f"Error while answering: {e}")
+
     def search_dataset(
             self,
             dataset_path: str,

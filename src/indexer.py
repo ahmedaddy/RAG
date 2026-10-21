@@ -47,8 +47,12 @@ def indexing_chunks(chunks: list) -> None:
         print("code:", len(code_chunks))
         print("doc type:", type(docs_chunks[0]))
         print("code type:", type(code_chunks[0]))
-        docs_corpus = [tokenize(f"{c.file_path}\n{c.text}") for c in docs_chunks]
-        code_corpus = [tokenize(f"{c.file_path}\n{c.text}") for c in code_chunks]
+        docs_corpus = [
+            tokenize(f"{c.file_path}\n{c.text}") for c in docs_chunks
+        ]
+        code_corpus = [
+            tokenize(f"{c.file_path}\n{c.text}") for c in code_chunks
+        ]
 
         all_chunks = docs_chunks + code_chunks
         all_corpus = docs_corpus + code_corpus
@@ -69,11 +73,12 @@ def load_index() -> tuple:
             chunks = pickle.load(f)
         return bm25, chunks
     except FileNotFoundError:
-        raise RuntimeError("Index files not found. Please run the indexing process first.")
+        raise ValueError("Index files not found. Please run \
+the indexing process first.")
     except PermissionError:
-        raise RuntimeError("Permission denied while accessing index files.")
+        raise ValueError("Permission denied while accessing index files.")
     except Exception as e:
-        raise RuntimeError(f"Error while loading index: {e}")
+        raise ValueError(f"Error while loading index: {e}")
     return None, None
 
 

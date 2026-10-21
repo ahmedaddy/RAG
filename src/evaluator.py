@@ -13,6 +13,7 @@ def get_overlap(start1, end1, start2, end2):
         return 0.0
     return intersection / union
 
+
 def evaluate_results(student_answer_path, dataset_path, k: int):
     try:
         with open(student_answer_path, "r", encoding="utf-8") as f:
@@ -59,8 +60,8 @@ def evaluate_results(student_answer_path, dataset_path, k: int):
                     found_count += 1
             try:
                 qustion_recall = found_count / len(correct_source)
-            except:
-                raise ZeroDivisionError(f"Error: The correct source \
+            except Exception:
+                raise ValueError(f"Error: The correct source \
 list is empty for question_id: {result.question_id}")
             recall[kval] += qustion_recall
     for kval in k_values:
