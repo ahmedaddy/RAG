@@ -7,13 +7,13 @@ class MinimalSource(BaseModel):
     file_path: str
     first_character_index: int
     last_character_index: int
-    text: str
 
 
 class DataSource(BaseModel):
     file_path: str
     first_character_index: int
     last_character_index: int
+    text: str
 
 
 class UnansweredQuestion(BaseModel):
@@ -22,7 +22,7 @@ class UnansweredQuestion(BaseModel):
 
 
 class AnsweredQuestion(UnansweredQuestion):
-    sources: List[DataSource]
+    sources: List[MinimalSource]
     answer: str
 
 
@@ -33,7 +33,7 @@ class RagDataset(BaseModel):
 class MinimalSearchResults(BaseModel):
     question_id: str
     question: str
-    retrieved_sources: List[MinimalSource]
+    retrieved_sources: List[DataSource]
 
 
 class MinimalAnswer(MinimalSearchResults):

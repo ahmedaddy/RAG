@@ -1,6 +1,6 @@
 try:
     from pathlib import Path
-    from .models import MinimalSource
+    from .models import DataSource
     import ast
 except ImportError as e:
     print(f"Error importing modules: {e}")
@@ -38,7 +38,7 @@ def chunk_md_txt_files(
         end = split_point_finder(file_path, file_text, start, max_chunk_size)
         chunk_content = file_text[start:end]
         if chunk_content:
-            chunks.append(MinimalSource(
+            chunks.append(DataSource(
                 file_path=str(file_path),
                 first_character_index=start,
                 last_character_index=end,
@@ -65,7 +65,7 @@ def split_large_chunk(
             if current:
                 chunk_text = "".join(current)
                 chunks.append(
-                    MinimalSource(
+                    DataSource(
                         file_path=str(file_path),
                         first_character_index=current_start,
                         last_character_index=current_start + len(chunk_text),
@@ -79,7 +79,7 @@ def split_large_chunk(
             for i in range(0, len(line), max_chunk_size):
                 sub_chunk = line[i:i + max_chunk_size]
                 chunks.append(
-                    MinimalSource(
+                    DataSource(
                         file_path=str(file_path),
                         first_character_index=current_start,
                         last_character_index=current_start + len(sub_chunk),
@@ -93,7 +93,7 @@ def split_large_chunk(
     if current:
         chunk_text = "".join(current)
         chunks.append(
-            MinimalSource(
+            DataSource(
                 file_path=str(file_path),
                 first_character_index=current_start,
                 last_character_index=current_start + len(chunk_text),
@@ -105,7 +105,11 @@ def split_large_chunk(
 
 def chunk_py_files(file_path: Path, code: str, max_chunk_size: int) -> list:
     # print(file_path)
-    tree = ast.parse(code)
+    try:
+        tree = ast.parse(code)
+    except SyntaxError as e:
+        print(f"Error parsing Python file: {file_path} - {e}")
+        return []
     chunks = []
     lines = code.splitlines(keepends=True)
     for node in tree.body:
@@ -123,7 +127,7 @@ def chunk_py_files(file_path: Path, code: str, max_chunk_size: int) -> list:
         chunks_text = code[start:end]
 
         if len(chunks_text) <= max_chunk_size:
-            chunks.append(MinimalSource(
+            chunks.append(DataSource(
                 file_path=str(file_path),
                 first_character_index=start,
                 last_character_index=end,

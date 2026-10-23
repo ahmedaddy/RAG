@@ -1,5 +1,4 @@
 try:
-    import fire
     import json
     from pathlib import Path
     from tqdm import tqdm
@@ -43,18 +42,21 @@ class RagPipeline:
     def search(self, query: str, k: int = 10) -> None:
         if not validate_input(query, k):
             return
-        bm25, chunks = load_index()
-        ranked = search_bm25(bm25, chunks, query, k, True)
+        try:
+            bm25, chunks = load_index()
+            ranked = search_bm25(bm25, chunks, query, k, True)
 
-        ranked.sort(reverse=True, key=lambda x: x[1])
-        results = (chunk for chunk, s in ranked[:k])
-        print(f"\nTop results for: '{query}'\n" + "=" * 40)
-        for i, chunk in enumerate(results):
-            print(
-                f"{i + 1}. {chunk.file_path}"
-                f" (Chars {chunk.first_character_index}-\
-{chunk.last_character_index})"
-            )
+            ranked.sort(reverse=True, key=lambda x: x[1])
+            results = (chunk for chunk, s in ranked[:k])
+            print(f"\nTop results for: '{query}'\n" + "=" * 40)
+            for i, chunk in enumerate(results):
+                print(
+                    f"{i + 1}. {chunk.file_path}"
+                    f" (Chars {chunk.first_character_index}-\
+    {chunk.last_character_index})"
+                )
+        except Exception as e:
+            raise ValueError(f"Error while searching: {e}")
 
     def answer(self, query: str, k: int = 10) -> None:
         try:
@@ -164,4 +166,10 @@ non-empty string and k must be a positive integer.")
 
 
 if __name__ == "__main__":
-    fire.Fire(RagPipeline)
+    try:
+        import fire
+        fire.Fire(RagPipeline)
+    except ImportError as e:
+        print(f"Error importing fire module: {e}")
+    except Exception as e:
+        print(f"Error initializing CLI: {e}")

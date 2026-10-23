@@ -26,9 +26,6 @@ def indexing_chunks(chunks: list) -> None:
     try:
         from rank_bm25 import BM25Okapi
         print("INDEXER:")
-        print(type(chunks))
-        print(type(chunks[0]))
-        print(chunks[0])
         print("#" * 40, "\n")
         print(f"Building index for {len(chunks)} chunks...")
         print("\n", "#" * 40)
