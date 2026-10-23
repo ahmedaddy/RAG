@@ -7,7 +7,7 @@ try:
     from .indexer import indexing_chunks, load_index, search_bm25
     from .generator import RAGGenerator
     from .models import RagDataset, StudentSearchResults, \
-        MinimalSearchResults, MinimalAnswer
+        MinimalSearchResults, MinimalAnswer, StudentSearchResultsAndAnswer
     from .evaluator import evaluate_results
 except ImportError as e:
     print(f"Error importing modules: {e}")
@@ -17,7 +17,7 @@ except Exception as e:
     raise
 
 
-def validate_input(query: str, k: int):
+def validate_input(query: str, k: int) -> bool:
     if not isinstance(query, str) or \
             not query.strip() or not isinstance(k, int) or k <= 0:
         return False
@@ -29,7 +29,7 @@ class RagPipeline:
             self,
             max_chunk_size: int = 2000,
             rep_path: str = "data/raw/vllm-0.10.1"
-            ):
+            ) -> None:
         if max_chunk_size <= 0 or max_chunk_size > 2000:
             print("Error: max_chunk_size must be between 1 and 2000.")
             return
@@ -40,7 +40,7 @@ class RagPipeline:
         except Exception as e:
             print(f"Error while getting indexing files: {e}")
 
-    def search(self, query: str, k: int = 10):
+    def search(self, query: str, k: int = 10) -> None:
         if not validate_input(query, k):
             return
         bm25, chunks = load_index()
@@ -56,12 +56,14 @@ class RagPipeline:
 {chunk.last_character_index})"
             )
 
-    def answer(self, query: str, k: int = 10):
+    def answer(self, query: str, k: int = 10) -> None:
         try:
             bm25, chunks = load_index()
             generator = RAGGenerator()
             if not validate_input(query, k):
-                return False
+                raise ValueError("Invalid input: query must be a \
+non-empty string and k must be a positive integer.")
+                return
             ranked = search_bm25(bm25, chunks, query, k, True)
             ranked.sort(reverse=True, key=lambda x: x[1])
             results = [chunk for chunk, s in ranked[:k]]
@@ -77,7 +79,7 @@ class RagPipeline:
             dataset_path: str,
             k: int = 10,
             save_directory: str = "data/output/search_results"
-            ):
+            ) -> None:
         if not validate_input("valid", k):
             print("Error: k must be a positive integer.")
             return
@@ -135,13 +137,15 @@ class RagPipeline:
                     retrieved_sources=result.retrieved_sources,
                     answer=answer_text
                     ))
-            output = StudentSearchResults(
+            output = StudentSearchResultsAndAnswer(
                 search_results=answers,
                 k=search_data.k
             )
-            save_directory = Path(save_directory)
-            save_directory.mkdir(parents=True, exist_ok=True)
-            save_path = save_directory / Path(student_search_results_path).name
+            save_directory_path = Path(save_directory)
+            save_directory_path.mkdir(parents=True, exist_ok=True)
+            save_path = (
+                save_directory_path / Path(student_search_results_path).name
+                )
             with open(save_path, "w", encoding="utf-8") as f:
                 f.write(output.model_dump_json(indent=2))
         except Exception as e:
@@ -152,7 +156,7 @@ class RagPipeline:
         student_answer_path: str,
         dataset_path: str,
         k: int = 10,
-    ):
+    ) -> None:
         try:
             evaluate_results(student_answer_path, dataset_path, k)
         except Exception as e:

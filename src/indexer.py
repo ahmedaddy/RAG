@@ -83,7 +83,11 @@ the indexing process first.")
 
 
 def search_bm25(
-        bm25: BM25Okapi, chunks: list, query: str, k: int, with_scores=False
+        bm25: BM25Okapi,
+        chunks: list,
+        query: str,
+        k: int,
+        with_scores: bool = False
         ) -> list:
     query_tokens = tokenize(query)
     scores = bm25.get_scores(query_tokens)

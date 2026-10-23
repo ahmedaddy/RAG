@@ -2,7 +2,12 @@ from .models import AnsweredQuestion, RagDataset, StudentSearchResults
 import json
 
 
-def get_overlap(start1, end1, start2, end2):
+def get_overlap(
+        start1: int,
+        end1: int,
+        start2: int,
+        end2: int
+        ) -> float:
     intersection_start = max(start1, start2)
     intersection_end = min(end1, end2)
     intersection = max(0, intersection_end - intersection_start)
@@ -14,7 +19,11 @@ def get_overlap(start1, end1, start2, end2):
     return intersection / union
 
 
-def evaluate_results(student_answer_path, dataset_path, k: int):
+def evaluate_results(
+        student_answer_path: str,
+        dataset_path: str,
+        k: int
+        ) -> None:
     try:
         with open(student_answer_path, "r", encoding="utf-8") as f:
             student_data = StudentSearchResults.model_validate(json.load(f))

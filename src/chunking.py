@@ -114,6 +114,8 @@ def chunk_py_files(file_path: Path, code: str, max_chunk_size: int) -> list:
             sum(len(line) for line in lines[:node.lineno - 1])
             + node.col_offset
             )
+        if node.end_lineno is None or node.end_col_offset is None:
+            continue
         end = (
             sum(len(line) for line in lines[:node.end_lineno - 1])
             + node.end_col_offset
@@ -143,7 +145,7 @@ def read_file(path: Path) -> str:
             return f.read()
     except Exception:
         print(f"Error reading file: {path}")
-        return None
+        return ""
 
 
 def chunk_files(file_path: Path, max_chunk_size: int) -> list:
@@ -152,16 +154,17 @@ def chunk_files(file_path: Path, max_chunk_size: int) -> list:
         return chunk_py_files(file_path, file_data, max_chunk_size)
     if file_path.suffix in [".md", ".txt"]:
         return chunk_md_txt_files(file_path, file_data, max_chunk_size)
+    return []
 
 
 def get_files(max_chunk_size: int, rep_path: str) -> list:
     # file = Path("data/r.py")
     # chunk_files(file, max_chunk_size)
     # return
-    rep_path = Path(rep_path)
+    repository_path = Path(rep_path)
     valid_suffixes = [".md", ".txt", ".py"]
     chunks = []
-    for file in rep_path.rglob("*"):
+    for file in repository_path.rglob("*"):
         if file.is_file() and file.suffix in valid_suffixes:
             chunks.extend(chunk_files(file, max_chunk_size))
     return chunks

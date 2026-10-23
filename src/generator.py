@@ -3,7 +3,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 class RAGGenerator:
-    def __init__(self, model_name="Qwen/Qwen3-0.6B"):
+    def __init__(self, model_name: str = "Qwen/Qwen3-0.6B"):
         self.model_name = model_name
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.model = AutoModelForCausalLM.from_pretrained(self.model_name)
@@ -11,7 +11,12 @@ class RAGGenerator:
         # This moves the model's parameters to the selected device.
         self.model.to(self.device)
 
-    def generate_answer(self, question, chunks, max_tokens=128):
+    def generate_answer(
+            self,
+            question: str,
+            chunks: list,
+            max_tokens: int = 128
+            ) -> str:
         context = []
         total_len = 0
         for c in chunks:
