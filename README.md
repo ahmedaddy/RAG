@@ -217,7 +217,8 @@ measured again after any change to chunking, tokenization, or ranking.
 - [Qwen3-0.6B model card](https://huggingface.co/Qwen/Qwen3-0.6B)
 
 ### AI usage
-
+<!-- This parts is build with Ai,I mean i asked him in what he helped me and that was he's answer -->
 AI tools were used as a learning and review aid: to clarify RAG concepts,
 review the assignment requirements, identify possible edge cases, and improve
-documentation.
+documentation. All implementation choices, testing, and final code review
+remain the responsibility of the project author.

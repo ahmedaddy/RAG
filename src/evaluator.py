@@ -30,21 +30,22 @@ def get_overlap(
 
 
 def evaluate_results(
-        student_answer_path: str,
+        student_search_results_path: str,
         dataset_path: str,
         k: int
         ) -> None:
     """
     Evaluate the student answers against the dataset.
     Args:
-        student_answer_path (str): The path to the student answers.
+        student_search_results_path (str):
+        The path to the student search results.
         dataset_path (str): The path to the dataset.
         k (int): The number of top results to consider.
     Returns:
         None
     """
     try:
-        with open(student_answer_path, "r", encoding="utf-8") as f:
+        with open(student_search_results_path, "r", encoding="utf-8") as f:
             student_data = StudentSearchResults.model_validate(json.load(f))
         with open(dataset_path, "r", encoding="utf-8") as f:
             correct_data = RagDataset.model_validate(json.load(f))

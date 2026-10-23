@@ -210,21 +210,22 @@ non-empty string and k must be a positive integer.")
 
     def evaluate(
         self,
-        student_answer_path: str,
+        student_search_results_path: str,
         dataset_path: str,
         k: int = 10,
     ) -> None:
         """
         Evaluate the student answers against the dataset.
         Args:
-            student_answer_path (str): The path to the student answers.
+            student_search_results_path (str):
+            The path to the student search results.
             dataset_path (str): The path to the dataset.
             k (int): The number of top results to consider.
         Returns:
             None
         """
         try:
-            evaluate_results(student_answer_path, dataset_path, k)
+            evaluate_results(student_search_results_path, dataset_path, k)
         except Exception as e:
             print(f"Error while evaluating: {e}")
 
