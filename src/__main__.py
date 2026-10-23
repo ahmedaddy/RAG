@@ -17,6 +17,14 @@ except Exception as e:
 
 
 def validate_input(query: str, k: int) -> bool:
+    """
+        Validate the input parameters for the search and answer methods.
+        Args:
+            query (str): The search query.
+            k (int): The number of top results to retrieve.
+        Returns:
+            bool: True if the input is valid, False otherwise.
+    """
     if not isinstance(query, str) or \
             not query.strip() or not isinstance(k, int) or k <= 0:
         return False
@@ -24,11 +32,23 @@ def validate_input(query: str, k: int) -> bool:
 
 
 class RagPipeline:
+    """
+    A class to handle the RAG (Retrieval-Augmented Generation) pipeline.
+    """
     def index(
             self,
             max_chunk_size: int = 2000,
             rep_path: str = "data/raw/vllm-0.10.1"
             ) -> None:
+        """
+        Index the files in the specified repository path.
+        Args:
+            max_chunk_size (int): The maximum size of each chunk.
+            rep_path (str): The path to the repository
+            containing files to index.
+        Returns:
+            None
+        """
         if max_chunk_size <= 0 or max_chunk_size > 2000:
             print("Error: max_chunk_size must be between 1 and 2000.")
             return
@@ -40,6 +60,14 @@ class RagPipeline:
             print(f"Error while getting indexing files: {e}")
 
     def search(self, query: str, k: int = 10) -> None:
+        """
+        Search for the top k results for the given query.
+        Args:
+            query (str): The search query.
+            k (int): The number of top results to retrieve.
+        Returns:
+            None
+        """
         if not validate_input(query, k):
             return
         try:
@@ -59,6 +87,14 @@ class RagPipeline:
             raise ValueError(f"Error while searching: {e}")
 
     def answer(self, query: str, k: int = 10) -> None:
+        """
+        Generate an answer for the given query using the top k results.
+        Args:
+            query (str): The search query.
+            k (int): The number of top results to retrieve.
+        Returns:
+            None
+        """
         try:
             bm25, chunks = load_index()
             generator = RAGGenerator()
@@ -82,6 +118,15 @@ non-empty string and k must be a positive integer.")
             k: int = 10,
             save_directory: str = "data/output/search_results"
             ) -> None:
+        """
+        Search the dataset for the top k results for each question.
+        Args:
+            dataset_path (str): The path to the dataset.
+            k (int): The number of top results to retrieve.
+            save_directory (str): The directory to save the search results.
+        Returns:
+            None
+        """
         if not validate_input("valid", k):
             print("Error: k must be a positive integer.")
             return
@@ -120,6 +165,16 @@ non-empty string and k must be a positive integer.")
         student_search_results_path: str,
         save_directory: str = "data/output/search_results_and_answer",
     ) -> None:
+        """
+        Generate answers for the questions in the student search results.
+        Args:
+            student_search_results_path (str): The path
+            to the student search results.
+            save_directory (str): The directory
+            to save the search results and answers.
+        Returns:
+            None
+        """
         try:
             with open(student_search_results_path, "r", encoding="utf-8") as f:
                 search_data = StudentSearchResults.model_validate(json.load(f))
@@ -159,6 +214,15 @@ non-empty string and k must be a positive integer.")
         dataset_path: str,
         k: int = 10,
     ) -> None:
+        """
+        Evaluate the student answers against the dataset.
+        Args:
+            student_answer_path (str): The path to the student answers.
+            dataset_path (str): The path to the dataset.
+            k (int): The number of top results to consider.
+        Returns:
+            None
+        """
         try:
             evaluate_results(student_answer_path, dataset_path, k)
         except Exception as e:

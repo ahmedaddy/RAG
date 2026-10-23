@@ -13,6 +13,16 @@ except Exception as e:
 def split_point_finder(
         file_path: Path, file_text: str, start: int, max_chunk_size: int
         ) -> int:
+    """
+    Find the optimal split point for a chunk of text.
+    Args:
+        file_path (Path): The path to the file.
+        file_text (str): The text of the file.
+        start (int): The starting index of the chunk.
+        max_chunk_size (int): The maximum size of the chunk.
+    Returns:
+        int: The index where the chunk should be split.
+    """
     if start + max_chunk_size >= len(file_text):
         return len(file_text)
     chunk = file_text[start:start + max_chunk_size]
@@ -31,6 +41,15 @@ def split_point_finder(
 def chunk_md_txt_files(
         file_path: Path, file_text: str, max_chunk_size: int
         ) -> list:
+    """
+    Chunk markdown and text files into smaller pieces.
+    Args:
+        file_path (Path): The path to the file.
+        file_text (str): The text of the file.
+        max_chunk_size (int): The maximum size of each chunk.
+    Returns:
+        list: A list of DataSource objects representing the chunks.
+    """
     overlap = int(max_chunk_size * 0.05)
     chunks = []
     start = 0
@@ -54,6 +73,16 @@ def chunk_md_txt_files(
 def split_large_chunk(
         file_path: Path, chunk: str, max_chunk_size: int, start: int
         ) -> list:
+    """
+    Split a large chunk into smaller pieces.
+    Args:
+        file_path (Path): The path to the file.
+        chunk (str): The text of the chunk.
+        max_chunk_size (int): The maximum size of each sub-chunk.
+        start (int): The starting index of the chunk.
+    Returns:
+        list: A list of DataSource objects representing the sub-chunks.
+    """
     lines = chunk.splitlines(keepends=True)
     chunks: list = []
     current: list = []
@@ -104,6 +133,15 @@ def split_large_chunk(
 
 
 def chunk_py_files(file_path: Path, code: str, max_chunk_size: int) -> list:
+    """
+    Chunk Python files into smaller pieces based on AST nodes.
+    Args:
+        file_path (Path): The path to the Python file.
+        code (str): The code of the Python file.
+        max_chunk_size (int): The maximum size of each chunk.
+    Returns:
+        list: A list of DataSource objects representing the chunks.
+    """
     # print(file_path)
     try:
         tree = ast.parse(code)
@@ -144,6 +182,13 @@ def chunk_py_files(file_path: Path, code: str, max_chunk_size: int) -> list:
 
 
 def read_file(path: Path) -> str:
+    """
+    Read the contents of a file.
+    Args:
+        path (Path): The path to the file.
+    Returns:
+        str: The contents of the file.
+    """
     try:
         with open(path, "r", encoding="UTF-8") as f:
             return f.read()
@@ -153,6 +198,14 @@ def read_file(path: Path) -> str:
 
 
 def chunk_files(file_path: Path, max_chunk_size: int) -> list:
+    """
+    Chunk files based on their type (Python, Markdown, or text).
+    Args:
+        file_path (Path): The path to the file.
+        max_chunk_size (int): The maximum size of each chunk.
+    Returns:
+        list: A list of DataSource objects representing the chunks.
+    """
     file_data = read_file(file_path)
     if file_path.suffix == ".py":
         return chunk_py_files(file_path, file_data, max_chunk_size)
@@ -162,6 +215,15 @@ def chunk_files(file_path: Path, max_chunk_size: int) -> list:
 
 
 def get_files(max_chunk_size: int, rep_path: str) -> list:
+    """
+    Get all files from the specified repository path and chunk them.
+    Args:
+        max_chunk_size (int): The maximum size of each chunk.
+        rep_path (str): The path to the repository containing files to index.
+    Returns:
+        list: A list of DataSource objects
+        representing the chunks from all files.
+    """
     # file = Path("data/r.py")
     # chunk_files(file, max_chunk_size)
     # return

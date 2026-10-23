@@ -8,6 +8,16 @@ def get_overlap(
         start2: int,
         end2: int
         ) -> float:
+    """
+    Calculate the overlap between two ranges.
+    Args:
+        start1 (int): The starting index of the first range.
+        end1 (int): The ending index of the first range.
+        start2 (int): The starting index of the second range.
+        end2 (int): The ending index of the second range.
+    Returns:
+        float: The overlap between the two ranges.
+    """
     intersection_start = max(start1, start2)
     intersection_end = min(end1, end2)
     intersection = max(0, intersection_end - intersection_start)
@@ -24,6 +34,15 @@ def evaluate_results(
         dataset_path: str,
         k: int
         ) -> None:
+    """
+    Evaluate the student answers against the dataset.
+    Args:
+        student_answer_path (str): The path to the student answers.
+        dataset_path (str): The path to the dataset.
+        k (int): The number of top results to consider.
+    Returns:
+        None
+    """
     try:
         with open(student_answer_path, "r", encoding="utf-8") as f:
             student_data = StudentSearchResults.model_validate(json.load(f))

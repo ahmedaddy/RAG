@@ -10,6 +10,13 @@ index_directory = Path("data/processed")
 
 
 def tokenize(text: str) -> list[str]:
+    """
+    Tokenize the input text into a list of tokens.
+    Args:
+        text (str): The input text to tokenize.
+    Returns:
+        list[str]: A list of tokens extracted from the input text.
+    """
     text = text.lower()
     punct = string.punctuation.replace('_', '')
     clean_text = text.translate(str.maketrans(punct, ' ' * len(punct)))
@@ -23,6 +30,14 @@ def tokenize(text: str) -> list[str]:
 
 
 def indexing_chunks(chunks: list) -> None:
+    """
+    Index the provided chunks using the BM25 algorithm.
+    Args:
+        chunks (list): A list of DataSource objectsrepresenting
+        the chunks to index.
+    Returns:
+        None
+    """
     try:
         from rank_bm25 import BM25Okapi
         print("INDEXER:")
@@ -63,6 +78,11 @@ def indexing_chunks(chunks: list) -> None:
 
 
 def load_index() -> tuple:
+    """
+    Load the BM25 index and chunks from the specified directory.
+    Returns:
+        tuple: A tuple containing the BM25 index and the list of chunks.
+    """
     try:
         with open(index_directory / "bm25_all.pkl", "rb") as f:
             bm25 = pickle.load(f)
@@ -86,6 +106,18 @@ def search_bm25(
         k: int,
         with_scores: bool = False
         ) -> list:
+    """
+    Search for the top k results for the given query using the BM25 index.
+    Args:
+        bm25 (BM25Okapi): The BM25 index.
+        chunks (list): A list of DataSource objects representing the chunks.
+        query (str): The search query.
+        k (int): The number of top results to retrieve.
+        with_scores (bool): Whether to return scores along with the results.
+    Returns:
+        list: A list of top k DataSource objects or tuples of
+        (DataSource, score) if with_scores is True.
+    """
     query_tokens = tokenize(query)
     scores = bm25.get_scores(query_tokens)
     score_index_pairs = [(scores[i], i) for i in range(len(scores))]

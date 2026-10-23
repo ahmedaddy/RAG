@@ -220,5 +220,4 @@ measured again after any change to chunking, tokenization, or ranking.
 
 AI tools were used as a learning and review aid: to clarify RAG concepts,
 review the assignment requirements, identify possible edge cases, and improve
-documentation. All implementation choices, testing, and final code review
-remain the responsibility of the project author.
+documentation.

@@ -17,6 +17,17 @@ class RAGGenerator:
             chunks: list,
             max_tokens: int = 128
             ) -> str:
+        """
+        Generate an answer to a question based on the provided context chunks.
+        Args:
+            question (str): The question to answer.
+            chunks (list): A list of DataSourceobjects representing
+            the context.
+            max_tokens (int): The maximum number of tokens to
+            generate for the answer.
+        Returns:
+            str: The generated answer.
+        """
         context = []
         total_len = 0
         for c in chunks:
