@@ -150,7 +150,7 @@ uv run python -m src answer_dataset \
 
 ```bash
 uv run python -m src evaluate \
-  --student_answer_path \
+  --student_search_results_path \
   data/output/search_results/UnansweredQuestions/dataset_docs_public.json \
   --dataset_path data/datasets/AnsweredQuestions/dataset_docs_public.json \
   --k 10

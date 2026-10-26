@@ -1,20 +1,25 @@
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from typing import Any, cast
+
+from .models import DataSource
 
 
 class RAGGenerator:
     def __init__(self, model_name: str = "Qwen/Qwen3-0.6B"):
         self.model_name = model_name
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        self.model = AutoModelForCausalLM.from_pretrained(self.model_name)
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.tokenizer: Any = AutoTokenizer.from_pretrained(self.model_name)
+        self.model: Any = AutoModelForCausalLM.from_pretrained(self.model_name)
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu"
+        )
         # This moves the model's parameters to the selected device.
-        self.model.to(self.device)
+        cast(Any, self.model).to(self.device)
 
     def generate_answer(
             self,
             question: str,
-            chunks: list,
+            chunks: list[DataSource],
             max_tokens: int = 128
             ) -> str:
         """
@@ -28,8 +33,8 @@ class RAGGenerator:
         Returns:
             str: The generated answer.
         """
-        context = []
-        total_len = 0
+        context: list[str] = []
+        total_len: int = 0
         for c in chunks:
             chunk_str = f"Source: {c.file_path}\n{c.text}\n"
             context.append(chunk_str)
@@ -131,8 +136,8 @@ class RAGGenerator:
         input_len = model_inputs["input_ids"].shape[1]
         generated_ids = generated[0][input_len:].tolist()
 
-        response: str = self.tokenizer.decode(
+        response = cast(str, self.tokenizer.decode(
             generated_ids, skip_special_tokens=True
-        )
+        ))
 
         return response.strip()
