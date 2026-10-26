@@ -228,6 +228,8 @@ def get_files(max_chunk_size: int, rep_path: str) -> list:
     # chunk_files(file, max_chunk_size)
     # return
     repository_path = Path(rep_path)
+    if not repository_path.exists():
+        raise FileNotFoundError(f"Repository path does not exist: {rep_path}")
     valid_suffixes = [".md", ".txt", ".py"]
     chunks = []
     for file in repository_path.rglob("*"):

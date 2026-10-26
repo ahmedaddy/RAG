@@ -68,13 +68,19 @@ class RagPipeline:
             None
         """
         if not validate_input(query, k):
-            return
+            raise ValueError("Error: Invalid input. Query must \
+be a non-empty string and k must be a positive integer.")
         try:
             bm25, chunks = load_index()
+            if k > len(chunks):
+                print(f"Warning: k ({k}) is greater than \
+the number of chunks ({len(chunks)}). Setting k to {len(chunks)}.")
+                k = len(chunks)
             ranked = search_bm25(bm25, chunks, query, k, True)
 
             ranked.sort(reverse=True, key=lambda x: x[1])
             results = (chunk for chunk, s in ranked[:k])
+            print("ranking length:", len(ranked))
             print(f"\nTop results for: '{query}'\n" + "=" * 40)
             for i, chunk in enumerate(results):
                 print(
@@ -128,8 +134,7 @@ non-empty string and k must be a positive integer.")
             None
         """
         if not validate_input("valid", k):
-            print("Error: k must be a positive integer.")
-            return
+            raise ValueError("Error: k must be a positive integer.")
         try:
             bm25, chunks = load_index()
 
