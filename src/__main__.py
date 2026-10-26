@@ -1,7 +1,7 @@
 import sys
 
 
-def main():
+def main() -> None:
     try:
         from .rag_pipeline import RagPipeline
         import fire
