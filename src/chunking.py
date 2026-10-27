@@ -192,8 +192,20 @@ def read_file(path: Path) -> str:
     try:
         with open(path, "r", encoding="UTF-8") as f:
             return f.read()
-    except Exception:
-        print(f"Error reading file: {path}")
+    except FileNotFoundError as e:
+        print(f"File not found: {path} - {e}")
+        return ""
+    except UnicodeDecodeError as e:
+        print(f"Unicode decode error for file: {path} - {e}")
+        return ""
+    except PermissionError as e:
+        print(f"Permission denied for file: {path} - {e}")
+        return ""
+    except IsADirectoryError as e:
+        print(f"Expected a file but found a directory: {path} - {e}")
+        return ""
+    except Exception as e:
+        print(f"Error reading file: {path} - {e}")
         return ""
 
 
