@@ -59,6 +59,9 @@ def evaluate_results(
         for q in correct_data.rag_questions
         if isinstance(q, AnsweredQuestion)
     }
+    if not correct_data_map:
+        print("No answered questions found in the evaluation dataset.")
+        return
     k_values = [1, 3, 5, 10]
     recall = {kval: 0.0 for kval in k_values}
     qustion_count = 0
@@ -70,6 +73,9 @@ def evaluate_results(
         correct_source = correct_question.sources
         # print(result)
         for kval in k_values:
+            if kval > k:
+                k_values.remove(kval)
+                continue
             top_k_retreived = result.retrieved_sources[:kval]
             found_count = 0
             for s in correct_source:

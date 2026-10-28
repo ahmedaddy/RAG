@@ -30,7 +30,8 @@ search_dataset_docs:
 eval:
 	uv run -m src evaluate \
 		--student_search_results_path data/output/search_results/UnansweredQuestions/dataset_docs_public.json \
-		--dataset_path data/datasets/AnsweredQuestions/dataset_docs_public.json
+		--dataset_path data/datasets/AnsweredQuestions/dataset_docs_public.json \
+		--k 10
 
 answer_dataset:
 	uv run python -m src answer_dataset \

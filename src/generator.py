@@ -1,8 +1,15 @@
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from typing import Any, cast
+try:
+    import torch
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from typing import Any, cast
 
-from .models import DataSource
+    from .models import DataSource
+except ImportError as e:
+    print(f"Error importing required modules: {e}")
+    raise
+except Exception as e:
+    print(f"Unexpected error during imports: {e}")
+    raise
 
 
 class RAGGenerator:

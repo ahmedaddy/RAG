@@ -53,6 +53,9 @@ class RagPipeline:
             return
         try:
             chunks = get_files(max_chunk_size, rep_path)
+            if not chunks:
+                print("No supported files found.")
+                return
             indexing_chunks(chunks)
             # print(chunks)
         except Exception as e:

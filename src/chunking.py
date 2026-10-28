@@ -1,6 +1,7 @@
 try:
     from pathlib import Path
     from .models import DataSource
+    from tqdm import tqdm
     import ast
 except ImportError as e:
     print(f"Error importing modules: {e}")
@@ -244,7 +245,13 @@ def get_files(max_chunk_size: int, rep_path: str) -> list:
         raise FileNotFoundError(f"Repository path does not exist: {rep_path}")
     valid_suffixes = [".md", ".txt", ".py"]
     chunks = []
-    for file in repository_path.rglob("*"):
-        if file.is_file() and file.suffix in valid_suffixes:
-            chunks.extend(chunk_files(file, max_chunk_size))
+    files = [
+        file for file in repository_path.rglob("*")
+        if file.is_file() and file.suffix in valid_suffixes
+    ]
+    for file in tqdm(
+        files,
+        desc="Indexing files"
+    ):
+        chunks.extend(chunk_files(file, max_chunk_size))
     return chunks
