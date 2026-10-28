@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List
 import uuid
 
@@ -43,6 +43,7 @@ class UnansweredQuestion(BaseModel):
         question_id (str): The ID of the question.
         question (str): The question text.
     """
+    model_config = ConfigDict(extra="forbid")
     question_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     question: str
 

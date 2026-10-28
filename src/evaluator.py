@@ -49,6 +49,9 @@ def evaluate_results(
             student_data = StudentSearchResults.model_validate(json.load(f))
         with open(dataset_path, "r", encoding="utf-8") as f:
             correct_data = RagDataset.model_validate(json.load(f))
+    except FileNotFoundError as e:
+        print(f"Error: File not found: {e}")
+        return
     except Exception as e:
         print(f"Error: Could not load student results or dataset: {e}")
         return
@@ -99,6 +102,12 @@ def evaluate_results(
                 raise ValueError(f"Error: The correct source \
 list is empty for question_id: {result.question_id}")
             recall[kval] += qustion_recall
+    if qustion_count == 0:
+        print(
+            "No matching question IDs found between student results "
+            "and evaluation dataset."
+        )
+        return
     for kval in k_values:
         recall[kval] /= qustion_count
     print("Evaluation Results:")
